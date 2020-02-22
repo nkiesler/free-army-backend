@@ -10,17 +10,16 @@ class ApiController extends Controller
 {
     function signup(Request $r){
 
-    	// return '1111';
         $validator = Validator::make(
             [
-                'name' => $r->name,
-                'surname' => $r->surname,
+                'first_name' => $r->first_name,
+                'last_name' => $r->last_name,
                 'email' => $r->email,
                 'password' =>$r->password,
             ],
             [
-                'name' => 'required',
-                'surname' => 'required',
+                'first_name' => 'required',
+                'last_name' => 'required',
                 'email' => 'required|email',
                 'password' => 'required',
             ]
@@ -30,7 +29,8 @@ class ApiController extends Controller
 
         if ($validator->fails())
         {
-           // 
+    		return 'validation failed';
+           
         } else {
 
             $new = new Users();
