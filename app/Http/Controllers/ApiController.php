@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Users;
 use Validator;
+use Illuminate\Support\Facades\Hash;
 
 class ApiController extends Controller
 {
