@@ -40,6 +40,8 @@ class ApiController extends Controller
             $new->password = Hash::make($r->password);
             $new->save();
 
+            var_dump('user saved')
+
             $current_user = Users::where('email', '=', $new->email)->get();
             
             return $current_user;
