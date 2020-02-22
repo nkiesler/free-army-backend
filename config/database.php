@@ -85,7 +85,7 @@ return [
             'sslmode' => 'prefer',
         ],
 
-        'pgsql_production' => [
+        'pgsql_prod' => [
             'driver' => 'pgsql',
             'host' => $host,
             'database' => $database,
