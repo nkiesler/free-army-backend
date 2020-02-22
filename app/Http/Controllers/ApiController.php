@@ -34,8 +34,8 @@ class ApiController extends Controller
         } else {
 
             $new = new Users();
-            $new->name = $r->first_name;
-            $new->surname = $r->last_name;
+            $new->first_name = $r->first_name;
+            $new->last_name = $r->last_name;
             $new->email = $r->email;
             $new->password = Hash::make($r->password);
             $new->save();
