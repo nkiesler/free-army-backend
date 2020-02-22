@@ -10,7 +10,7 @@ class ApiController extends Controller
 {
     function signup(Request $r){
 
-
+    	return '1111';
         $validator = Validator::make(
             [
                 'name' => $r->name,
