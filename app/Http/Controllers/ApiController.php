@@ -21,7 +21,7 @@ class ApiController extends Controller
             [
                 'first_name' => 'required',
                 'last_name' => 'required',
-                'email' => 'required|email',
+                'email' => 'required|email|unique:users',
                 'password' => 'required',
             ]
         );
@@ -30,7 +30,10 @@ class ApiController extends Controller
 
         if ($validator->fails())
         {
-    		return 'validation failed';
+    		return [
+    			'error' => true,
+    			'reason' => $validator->errors()->first(),
+    		];
            
         } else {
 
@@ -49,23 +52,25 @@ class ApiController extends Controller
         
     }
 
-    // function login(Request $r){
-    //     $email = $r->email;
-    //     $password = $r->password;
+    function login (Request $request) {
+        $email = $request->email;
+        $password = $request->password;
 
-    //     if (Usermodel::where([['email', '=', $email]])->exists()) {
-    //         $user = Usermodel::where('email', '=', $email)->get();
-    //         if (Hash::check($password, $user[0]->password)){
-    //             Session::put('user', $user);
-    //             return Redirect::to("/profile");
-    //         }
-    //         else {
-    //             return view('login')->withErrors('Your password is incorrect');
-    //         }
-    //     }
-    //     else{
-    //         return Redirect::to("/signup")->withErrors('Please sign up first');
-    //     }
-      
-    // }
+        if (Users::where([['email', '=', $email]])->exists()) {
+            $user = Users::where('email', '=', $email)->get();
+            $errObj = [
+            	'error' => true,
+            	'signedUp' => true,
+            ];
+            return Hash::check($password, $user[0]->password) ? $user : $errObj;
+        }
+        else {
+        	$errObj = [
+        		'error' => true,
+            	'signedUp' => false,
+        	];
+            return $errObj;
+        }
+    }
+
 }
