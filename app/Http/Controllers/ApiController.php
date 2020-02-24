@@ -44,7 +44,7 @@ class ApiController extends Controller
             $new->password = Hash::make($r->password);
             $new->save();
 
-            $current_user = Users::where('email', '=', $new->email)->first();
+            $current_user = Users::where('email', '=', $new->email)->get();
             
             return $current_user;
         }
@@ -57,7 +57,7 @@ class ApiController extends Controller
         $password = $request->password;
 
         if (Users::where([['email', '=', $email]])->exists()) {
-            $user = Users::where('email', '=', $email)->first();
+            $user = Users::where('email', '=', $email)->get();
             $errObj = [
             	'error' => true,
             	'reason' => 'This email is already used',
