@@ -73,7 +73,7 @@ class ApiController extends Controller
                 $current_user = User::where('email', '=', $new->email)->get()->first();
                 $current_user->auth_token = $token;
                 $current_user->save();
-                $response = ['success'=>true, 'data'=>['name'=>$current_user->name,'id'=>$current_user->id,'email'=>$current_user->email,'auth_token'=>$token]]; 
+                $response = ['success'=>true, 'data'=>['first_name'=>$current_user->first_name, 'last_name' => $current_user->last_name ,'id'=>$current_user->id,'email'=>$current_user->email,'auth_token'=>$token]]; 
             } else {
                 $response = ['success'=>false, 'reason'=>'Couldnt register user'];
             }
@@ -92,7 +92,7 @@ class ApiController extends Controller
                 $token = self::getToken($email, $password);
                 $user->auth_token = $token;
                 $user->save();
-                $response = ['success'=>true, 'data'=>['id'=>$user->id,'auth_token'=>$user->auth_token,'name'=>$user->first_name, 'email'=>$user->email]];
+                $response = ['success'=>true, 'data'=>['id'=>$user->id,'auth_token'=>$user->auth_token,'first_name'=>$user->first_name, 'last_name'=>$user->last_name, 'email'=>$user->email]];
             }
             
         }
@@ -105,6 +105,21 @@ class ApiController extends Controller
 
         return response()->json($response, 201);
 
+    }
+
+    function update_settings (Request $request) {
+        $user = User::where('id', '=', $request->id)->get()->first();
+        if ($user) {
+            $user->update($request->all());
+            return [
+                'success' => true,
+                'data'=>['id'=>$user->id,'auth_token'=>$user->auth_token,'first_name'=>$user->first_name, 'last_name'=>$user->last_name, 'email'=>$user->email]
+            ];
+        }
+
+        return [
+            'success' => false,
+        ]
     }
 
 }
