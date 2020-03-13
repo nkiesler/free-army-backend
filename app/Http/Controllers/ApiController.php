@@ -3,12 +3,34 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Users;
+use App\User;
 use Validator;
 use Illuminate\Support\Facades\Hash;
+use JWTAuth;
+use JWTAuthException;
 
 class ApiController extends Controller
-{
+{   
+    private function getToken($email, $password) {
+        $token = null;
+        //$credentials = $request->only('email', 'password');
+        try {
+            if (!$token = JWTAuth::attempt( ['email'=>$email, 'password'=>$password])) {
+                return response()->json([
+                    'response' => 'error',
+                    'message' => 'Password or email is invalid',
+                    'token'=>$token
+                ]);
+            }
+        } catch (JWTAuthException $e) {
+            return response()->json([
+                'response' => 'error',
+                'message' => 'Token creation failed',
+            ]);
+        }
+        return $token;
+    }
+
     function signup(Request $r){
 
         $validator = Validator::make(
@@ -37,40 +59,52 @@ class ApiController extends Controller
            
         } else {
 
-            $new = new Users();
+            $new = new User();
             $new->first_name = $r->first_name;
             $new->last_name = $r->last_name;
             $new->email = $r->email;
             $new->password = Hash::make($r->password);
-            $new->save();
+            $new->auth_token = '';
+            $current_user = $new->save();
 
-            $current_user = Users::where('email', '=', $new->email)->get();
-            
-            return $current_user;
-        }
+            if ($current_user) {
+                $token = self::getToken($r->email, $r->password);
+                if (!is_string($token))  return response()->json(['success'=>false,'data'=>'Token generation failed'], 201);
+                $current_user = User::where('email', '=', $new->email)->get()->first();
+                $current_user->auth_token = $token;
+                $current_user->save();
+                $response = ['success'=>true, 'data'=>['name'=>$current_user->name,'id'=>$current_user->id,'email'=>$current_user->email,'auth_token'=>$token]]; 
+            } else {
+                $response = ['success'=>false, 'reason'=>'Couldnt register user'];
+            }
 
-        
+            return response()->json($response, 201);
+        } 
     }
 
     function login (Request $request) {
         $email = $request->email;
         $password = $request->password;
 
-        if (Users::where([['email', '=', $email]])->exists()) {
-            $user = Users::where('email', '=', $email)->get();
-            $errObj = [
-            	'error' => true,
-            	'reason' => 'This email is already used',
-            ];
-            return Hash::check($password, $user[0]->password) ? $user : $errObj;
+        if (User::where([['email', '=', $email]])->exists()) {
+            $user = User::where('email', '=', $email)->get()->first();
+            if ($user && Hash::check($password, $user->password)) {
+                $token = self::getToken($email, $password);
+                $user->auth_token = $token;
+                $user->save();
+                $response = ['success'=>true, 'data'=>['id'=>$user->id,'auth_token'=>$user->auth_token,'name'=>$user->first_name, 'email'=>$user->email]];
+            }
+            
         }
         else {
-        	$errObj = [
-        		'error' => true,
+        	$response = [
+        		'success' => false,
             	'reason' => 'Please create an account first',
         	];
-            return $errObj;
         }
+
+        return response()->json($response, 201);
+
     }
 
 }
