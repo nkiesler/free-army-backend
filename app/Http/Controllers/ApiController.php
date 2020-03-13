@@ -119,7 +119,7 @@ class ApiController extends Controller
 
         return [
             'success' => false,
-        ]
+        ];
     }
 
 }
