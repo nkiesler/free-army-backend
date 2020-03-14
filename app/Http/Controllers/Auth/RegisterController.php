@@ -68,6 +68,7 @@ class RegisterController extends Controller
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
+            'referral_link' => env('APP_URL') . '/sign-up?ref='. $data['email']
         ]);
     }
 }

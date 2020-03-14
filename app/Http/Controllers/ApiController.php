@@ -11,6 +11,7 @@ use JWTAuthException;
 
 class ApiController extends Controller
 {   
+    public $reff_id;
     private function getToken($email, $password) {
         $token = null;
         //$credentials = $request->only('email', 'password');
@@ -59,12 +60,18 @@ class ApiController extends Controller
            
         } else {
 
+            if (!empty($r->reff)) {
+                $reff_id = User::where(['email' => $r->reff])->first();
+                User::where(['email' => $r->reff])->update(array('referral_count' => $reff_id->referral_count + 1));
+            }
             $new = new User();
             $new->first_name = $r->first_name;
             $new->last_name = $r->last_name;
             $new->email = $r->email;
             $new->password = Hash::make($r->password);
             $new->auth_token = '';
+            $new->referral_link = env('APP_URL') . '/sign-up?ref='. $r->email;
+            $new->referrer_id = isset($reff_id) ? $reff_id->id : null;
             $current_user = $new->save();
 
             if ($current_user) {
@@ -92,7 +99,7 @@ class ApiController extends Controller
                 $token = self::getToken($email, $password);
                 $user->auth_token = $token;
                 $user->save();
-                $response = ['success'=>true, 'data'=>['id'=>$user->id,'auth_token'=>$user->auth_token,'first_name'=>$user->first_name, 'last_name'=>$user->last_name, 'email'=>$user->email]];
+                $response = ['success'=>true, 'data'=>['id'=>$user->id,'auth_token'=>$user->auth_token,'first_name'=>$user->first_name, 'last_name'=>$user->last_name, 'email'=>$user->email, 'referral_link'=>$user->referral_link]];
             }
             
         }

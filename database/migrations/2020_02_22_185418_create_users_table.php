@@ -15,6 +15,10 @@ class CreateUsersTable extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->unsignedBigInteger('referrer_id')->nullable();
+            $table->foreign('referrer_id')->references('id')->on('users');
+            $table->string('referral_link')->nullable();
+            $table->integer('referral_count')->default('0');
             $table->string('first_name');
             $table->string('last_name');
             $table->string('email')->unique();
