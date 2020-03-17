@@ -30,6 +30,6 @@ class SendMailable extends Mailable
      */
     public function build()
     {
-        return $this->view('name');
+        return $this->view('invite');
     }
 }
