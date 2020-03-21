@@ -80,7 +80,7 @@ class ApiController extends Controller
                 $current_user = User::where('email', '=', $new->email)->get()->first();
                 $current_user->auth_token = $token;
                 $current_user->save();
-                $response = ['success'=>true, 'data'=>['first_name'=>$current_user->first_name, 'last_name' => $current_user->last_name ,'id'=>$current_user->id,'email'=>$current_user->email,'auth_token'=>$token]]; 
+                $response = ['success'=>true, 'data'=>['first_name'=>$current_user->first_name, 'last_name' => $current_user->last_name ,'id'=>$current_user->id,'email'=>$current_user->email,'auth_token'=>$token, 'created_at' => $current_user->created_at]]; 
             } else {
                 $response = ['success'=>false, 'reason'=>'Couldnt register user'];
             }
@@ -120,7 +120,7 @@ class ApiController extends Controller
             $user->update($request->all());
             return [
                 'success' => true,
-                'data'=>['id'=>$user->id,'auth_token'=>$user->auth_token,'first_name'=>$user->first_name, 'last_name'=>$user->last_name, 'email'=>$user->email]
+                'data'=>['id'=>$user->id,'auth_token'=>$user->auth_token,'first_name'=>$user->first_name, 'last_name'=>$user->last_name, 'email'=>$user->email, 'created_at' => $user->created_at]
             ];
         }
 
