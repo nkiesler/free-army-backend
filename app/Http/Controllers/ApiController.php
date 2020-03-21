@@ -99,7 +99,7 @@ class ApiController extends Controller
                 $token = self::getToken($email, $password);
                 $user->auth_token = $token;
                 $user->save();
-                $response = ['success'=>true, 'data'=>['id'=>$user->id,'auth_token'=>$user->auth_token,'first_name'=>$user->first_name, 'last_name'=>$user->last_name, 'email'=>$user->email, 'referral_link'=>$user->referral_link]];
+                $response = ['success'=>true, 'data'=>['id'=>$user->id,'auth_token'=>$user->auth_token,'first_name'=>$user->first_name, 'last_name'=>$user->last_name, 'email'=>$user->email, 'referral_link'=>$user->referral_link, 'created_at' => $user->created_at ]];
             }
             
         }
@@ -126,6 +126,27 @@ class ApiController extends Controller
 
         return [
             'success' => false,
+        ];
+    }
+
+    function change_password (Request $request) {
+        $user = User::where('email', '=', $request->user_email)->get()->first();
+        if ($user && Hash::check($request->old_password, $user->password)) {
+            $user->password = Hash::make($request->new_password);
+            $user->save();
+            return [
+                'success' => true,
+            ];
+        } else {
+            return [
+                'success' => false,
+                'message' => "Password isn't correct",
+            ];
+        }
+
+        return [
+            'success' => false,
+            'message' => 'Error',
         ];
     }
 
