@@ -8,6 +8,9 @@ use Validator;
 use Illuminate\Support\Facades\Hash;
 use JWTAuth;
 use JWTAuthException;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\VerifyMail;
 
 class ApiController extends Controller
 {   
@@ -72,17 +75,37 @@ class ApiController extends Controller
             $new->auth_token = '';
             $new->referral_link = env('APP_URL') . '/sign-up?ref='. $r->email;
             $new->referrer_id = isset($reff_id) ? $reff_id->id : null;
+            $new->verification_token = Str::random(40);
             $current_user = $new->save();
 
             if ($current_user) {
+                $current_user = User::where('email', '=', $new->email)->get()->first();
+
+                $verify_link = env('APP_URL') . '/login/verify?email='. $current_user->email. '&token=' . $current_user->verification_token; 
+                Mail::to($current_user->email)->send(new VerifyMail($current_user, $verify_link));
+
                 $token = self::getToken($r->email, $r->password);
                 if (!is_string($token))  return response()->json(['success'=>false,'message'=>'Token generation failed'], 201);
-                $current_user = User::where('email', '=', $new->email)->get()->first();
                 $current_user->auth_token = $token;
                 $current_user->save();
-                $response = ['success'=>true, 'data'=>['first_name'=>$current_user->first_name, 'last_name' => $current_user->last_name ,'id'=>$current_user->id,'email'=>$current_user->email,'auth_token'=>$token, 'created_at' => $current_user->created_at]]; 
+                $response = [
+                    'success'=>true, 
+                    'data'=>[
+                        'first_name'=>$current_user->first_name, 
+                        'last_name' => $current_user->last_name ,
+                        'id'=>$current_user->id,
+                        'email'=>$current_user->email,
+                        'auth_token'=>$token, 
+                        'created_at' => $current_user->created_at,
+                        'verification_token' => $current_user->verification_token,
+                        'verified' => $current_user->verified,
+                    ]
+                ]; 
             } else {
-                $response = ['success'=>false, 'message'=>'Couldnt register user'];
+                $response = [
+                    'success'=>false, 
+                    'message'=>'Couldnt register user'
+                ];
             }
 
             return response()->json($response, 201);
@@ -100,7 +123,20 @@ class ApiController extends Controller
                     $token = self::getToken($email, $password);
                     $user->auth_token = $token;
                     $user->save();
-                    $response = ['success'=>true, 'data'=>['id'=>$user->id,'auth_token'=>$user->auth_token,'first_name'=>$user->first_name, 'last_name'=>$user->last_name, 'email'=>$user->email, 'referral_link'=>$user->referral_link, 'created_at' => $user->created_at ]];
+                    $response = [
+                        'success'=>true, 
+                        'data'=>[
+                            'id'=>$user->id,
+                            'auth_token'=>$user->auth_token,
+                            'first_name'=>$user->first_name, 
+                            'last_name'=>$user->last_name, 
+                            'email'=>$user->email, 
+                            'referral_link'=>$user->referral_link, 
+                            'created_at' => $user->created_at,
+                            'verification_token' => $user->verification_token,
+                            'verified' => $user->verified,
+                        ]
+                    ];
                 } else {
                     $response = [
                         'success' => false,
@@ -127,7 +163,16 @@ class ApiController extends Controller
             $user->update($request->all());
             return [
                 'success' => true,
-                'data'=>['id'=>$user->id,'auth_token'=>$user->auth_token,'first_name'=>$user->first_name, 'last_name'=>$user->last_name, 'email'=>$user->email, 'created_at' => $user->created_at]
+                'data'=>[
+                    'id'=>$user->id,
+                    'auth_token'=>$user->auth_token,
+                    'first_name'=>$user->first_name, 
+                    'last_name'=>$user->last_name, 
+                    'email'=>$user->email, 
+                    'created_at' => $user->created_at,
+                    'verification_token' => $user->verification_token,
+                    'verified' => $user->verified,
+                ]
             ];
         }
 
@@ -156,5 +201,25 @@ class ApiController extends Controller
             'message' => 'Error',
         ];
     }
+
+    function verify_account (Request $request) {
+        $user = User::where('email', '=', $request->email)->get()->first();
+
+        if ($user && $user->verification_token == $request->token) {
+            $user->verification_token = null;
+            $user->verified = true;
+            $user->save();
+
+
+            return [
+                'success' => true
+            ];
+        }
+
+        return [
+            'success' => false
+        ];
+    }
+
 
 }

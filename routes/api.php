@@ -22,6 +22,7 @@ Route::post('invite_friend', 'InviteController@invite_friend');
 
 Route::post('change_password', 'ApiController@change_password');
 
+Route::post('verify_account', 'ApiController@verify_account');
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
