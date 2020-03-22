@@ -76,13 +76,13 @@ class ApiController extends Controller
 
             if ($current_user) {
                 $token = self::getToken($r->email, $r->password);
-                if (!is_string($token))  return response()->json(['success'=>false,'data'=>'Token generation failed'], 201);
+                if (!is_string($token))  return response()->json(['success'=>false,'message'=>'Token generation failed'], 201);
                 $current_user = User::where('email', '=', $new->email)->get()->first();
                 $current_user->auth_token = $token;
                 $current_user->save();
                 $response = ['success'=>true, 'data'=>['first_name'=>$current_user->first_name, 'last_name' => $current_user->last_name ,'id'=>$current_user->id,'email'=>$current_user->email,'auth_token'=>$token, 'created_at' => $current_user->created_at]]; 
             } else {
-                $response = ['success'=>false, 'reason'=>'Couldnt register user'];
+                $response = ['success'=>false, 'message'=>'Couldnt register user'];
             }
 
             return response()->json($response, 201);
@@ -95,22 +95,29 @@ class ApiController extends Controller
 
         if (User::where([['email', '=', $email]])->exists()) {
             $user = User::where('email', '=', $email)->get()->first();
-            if ($user && Hash::check($password, $user->password)) {
-                $token = self::getToken($email, $password);
-                $user->auth_token = $token;
-                $user->save();
-                $response = ['success'=>true, 'data'=>['id'=>$user->id,'auth_token'=>$user->auth_token,'first_name'=>$user->first_name, 'last_name'=>$user->last_name, 'email'=>$user->email, 'referral_link'=>$user->referral_link, 'created_at' => $user->created_at ]];
+            if ($user) {
+                if (Hash::check($password, $user->password)) {      
+                    $token = self::getToken($email, $password);
+                    $user->auth_token = $token;
+                    $user->save();
+                    $response = ['success'=>true, 'data'=>['id'=>$user->id,'auth_token'=>$user->auth_token,'first_name'=>$user->first_name, 'last_name'=>$user->last_name, 'email'=>$user->email, 'referral_link'=>$user->referral_link, 'created_at' => $user->created_at ]];
+                } else {
+                    $response = [
+                        'success' => false,
+                        'message' => 'Incorrect password',
+                    ];
+                }
             }
             
         }
         else {
         	$response = [
         		'success' => false,
-            	'reason' => 'Please create an account first',
+            	'message' => 'Please create an account first',
         	];
         }
 
-        return response()->json($response, 201);
+        return $response;
 
     }
 
