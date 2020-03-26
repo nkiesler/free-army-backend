@@ -19,6 +19,7 @@ Route::post('invite_friend', 'InviteController@invite_friend');
 Route::post('change_password', 'ApiController@change_password');
 Route::post('verify_account', 'ApiController@verify_account');
 
+Route::post('get_campaigns', 'CampaignController@get_campaigns');
 Route::post('complete_campaign', 'CampaignController@complete_campaign');
 Route::post('campaign_progress', 'CampaignController@campaign_progress');
 

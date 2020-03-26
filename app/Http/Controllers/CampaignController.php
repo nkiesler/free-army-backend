@@ -10,7 +10,26 @@ use App\User;
 
 
 class CampaignController extends Controller
-{
+{	
+
+	function get_campaigns(Request $request) {
+        $user = User::where('auth_token', $request->auth_token)->first();
+        $user_campaigns = $user->campaigns;
+        $all_campaigns = Campaign::all();
+
+        foreach ($all_campaigns as $campaign) {
+        	foreach ($user_campaigns as $completed) {
+        		if ($campaign['id'] == $completed['id']) {
+        			$campaign['completed'] = true;
+        		} else {
+        			$campaign['completed'] = false;
+        		}
+        	}
+        }
+
+        return $all_campaigns;
+	}
+
     function complete_campaign(Request $request) {
 
         $new = new UserCampaign();
@@ -24,7 +43,7 @@ class CampaignController extends Controller
 
         $user = User::where('auth_token', $request->auth_token)->first();
 
-        $user_campaigns = UserCampaign::where('user_id', $user->id)->get();
+        $user_campaigns = $user->campaigns;
         $all_campaigns = Campaign::all();
 
         return [
