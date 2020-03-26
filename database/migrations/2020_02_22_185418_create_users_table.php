@@ -23,6 +23,8 @@ class CreateUsersTable extends Migration
             $table->string('last_name');
             $table->string('email')->unique();
             $table->string('password');
+            $table->string('bitcoin_wallet_pub')->nullable();
+            $table->string('ethereum_wallet_pub')->nullable();
             $table->timestamps();
         });
     }

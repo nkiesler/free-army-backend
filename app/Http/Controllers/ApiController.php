@@ -72,6 +72,8 @@ class ApiController extends Controller
             $new->last_name = $r->last_name;
             $new->email = $r->email;
             $new->password = Hash::make($r->password);
+            $new->ethereum_wallet_pub = null;
+            $new->bitcoin_wallet_pub = null;
             $new->auth_token = '';
             $new->referral_link = env('APP_URL') . '/sign-up?ref='. $r->email;
             $new->referrer_id = isset($reff_id) ? $reff_id->id : null;
@@ -99,6 +101,8 @@ class ApiController extends Controller
                         'created_at' => $current_user->created_at,
                         'verification_token' => $current_user->verification_token,
                         'verified' => $current_user->verified,
+                        'bitcoin_wallet_pub'=>$current_user->bitcoin_wallet_pub,
+                        'ethereum_wallet_pub'=>$current_user->ethereum_wallet_pub,
                     ]
                 ]; 
             } else {
@@ -135,6 +139,8 @@ class ApiController extends Controller
                             'created_at' => $user->created_at,
                             'verification_token' => $user->verification_token,
                             'verified' => $user->verified,
+                            'bitcoin_wallet_pub'=>$current_user->bitcoin_wallet_pub,
+                            'ethereum_wallet_pub'=>$current_user->ethereum_wallet_pub,
                         ]
                     ];
                 } else {
@@ -172,6 +178,8 @@ class ApiController extends Controller
                     'created_at' => $user->created_at,
                     'verification_token' => $user->verification_token,
                     'verified' => $user->verified,
+                    'bitcoin_wallet_pub'=>$current_user->bitcoin_wallet_pub,
+                    'ethereum_wallet_pub'=>$current_user->ethereum_wallet_pub,
                 ]
             ];
         }
