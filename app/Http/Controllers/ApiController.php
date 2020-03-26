@@ -72,8 +72,8 @@ class ApiController extends Controller
             $new->last_name = $r->last_name;
             $new->email = $r->email;
             $new->password = Hash::make($r->password);
-            $new->ethereum_wallet_pub = null;
-            $new->bitcoin_wallet_pub = null;
+            $new->ethereum_wallet_pub = '';
+            $new->bitcoin_wallet_pub = '';
             $new->auth_token = '';
             $new->referral_link = env('APP_URL') . '/sign-up?ref='. $r->email;
             $new->referrer_id = isset($reff_id) ? $reff_id->id : null;
