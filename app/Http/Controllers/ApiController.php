@@ -99,18 +99,7 @@ class ApiController extends Controller
                 $current_user->save();
                 $response = [
                     'success'=>true, 
-                    'data'=>[
-                        'first_name'=>$current_user->first_name, 
-                        'last_name' => $current_user->last_name ,
-                        'id'=>$current_user->id,
-                        'email'=>$current_user->email,
-                        'auth_token'=>$token, 
-                        'created_at' => $current_user->created_at,
-                        'verification_token' => $current_user->verification_token,
-                        'verified' => $current_user->verified,
-                        'bitcoin_wallet_pub'=>$current_user->bitcoin_wallet_pub,
-                        'ethereum_wallet_pub'=>$current_user->ethereum_wallet_pub,
-                    ]
+                    'email'=>$current_user->email,
                 ]; 
             } else {
                 $response = [
