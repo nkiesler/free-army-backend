@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\User;
+use App\Referral;
 use Validator;
 use Illuminate\Support\Facades\Hash;
 use JWTAuth;
@@ -81,6 +82,12 @@ class ApiController extends Controller
             $current_user = $new->save();
 
             if ($current_user) {
+
+                if (isset($reff_id)) {
+                    $referral = Referral::where(['user_email' => $r->email])
+                                    ->update(array('registered' => true));
+                }
+
                 $current_user = User::where('email', '=', $new->email)->get()->first();
 
                 $verify_link = env('APP_URL') . '/login/verify?email='. $current_user->email. '&token=' . $current_user->verification_token; 

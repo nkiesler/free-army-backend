@@ -15,9 +15,11 @@ use Illuminate\Http\Request;
 Route::post('signup', 'ApiController@signup');
 Route::post('login', 'ApiController@login');
 Route::post('update_settings', 'ApiController@update_settings');
-Route::post('invite_friend', 'InviteController@invite_friend');
 Route::post('change_password', 'ApiController@change_password');
 Route::post('verify_account', 'ApiController@verify_account');
+
+Route::post('invite_friend', 'InviteController@invite_friend');
+Route::post('get_referrals', 'InviteController@get_referrals');
 
 Route::post('get_campaigns', 'CampaignController@get_campaigns');
 Route::post('complete_campaign', 'CampaignController@complete_campaign');

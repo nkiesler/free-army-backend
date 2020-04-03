@@ -54,4 +54,8 @@ class User extends Authenticatable implements JWTSubject
         return $this->belongsToMany('App\Campaign', 'user_campaign', 'user_id', 'campaign_id');
     }
 
+    public function referrals() {
+        return $this->hasMany('App\Referral', 'referrer_id');
+    }
+
 }
