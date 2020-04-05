@@ -18,13 +18,17 @@ class CampaignController extends Controller
         $all_campaigns = Campaign::all();
 
         foreach ($all_campaigns as $campaign) {
-        	foreach ($user_campaigns as $completed) {
-        		if ($campaign['id'] == $completed['id']) {
-        			$campaign['completed'] = true;
-        		} else {
-        			$campaign['completed'] = false;
-        		}
-        	}
+            if (count($user_campaigns)) {
+            	foreach ($user_campaigns as $completed) {
+            		if ($campaign['id'] == $completed['id']) {
+            			$campaign['completed'] = true;
+            		} else {
+            			$campaign['completed'] = false;
+            		}
+            	}
+            } else {
+                $campaign['completed'] = false;
+            }
         }
 
         return $all_campaigns;
