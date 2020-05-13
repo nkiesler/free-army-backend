@@ -12,6 +12,7 @@ use JWTAuthException;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\VerifyMail;
+use App\Mail\ResetPassword;
 
 class ApiController extends Controller
 {   
@@ -223,6 +224,46 @@ class ApiController extends Controller
         return [
             'success' => false
         ];
+    }
+
+    function send_reset_email (Request $request) {
+        $user = User::where('email', '=', $request->email)->get()->first();
+
+        if ($user) {
+            $user->reset_token = Str::random(40);
+            $user->save();
+
+            $reset_link = env('APP_URL') . '/new-password?email='. $user->email. '&token=' . $user->reset_token; 
+            Mail::to($user->email)->send(new ResetPassword($user, $reset_link));
+
+            return [
+                'success' => true
+            ];
+        } else {
+            return [
+                'success' => false,
+                'message' => 'Wrong credentials'
+            ];
+        }
+    }
+
+    function reset_password (Request $request) {
+        $user = User::where('email', '=', $request->email)->get()->first();
+
+        if ($user && $user->reset_token == $request->reset_token) {
+            $user->password = Hash::make($request->password);
+            $user->reset_token = null;
+            $user->save();
+            return [
+                'success' => true,
+            ];
+        } else {
+            return [
+                'success' => false,
+                'message' => 'Wrong credentials'
+            ];
+        }
+
     }
 
 

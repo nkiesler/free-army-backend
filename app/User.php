@@ -12,6 +12,9 @@ class User extends Authenticatable implements JWTSubject
     use Notifiable;
 
     protected $table = 'users';
+
+    const ADMIN_TYPE = 'admin';
+    const DEFAULT_TYPE = 'default';
     
 
      /**
@@ -56,6 +59,10 @@ class User extends Authenticatable implements JWTSubject
 
     public function referrals() {
         return $this->hasMany('App\Referral', 'referrer_id');
+    }
+
+    public function isAdmin()    {        
+        return $this->type === self::ADMIN_TYPE;    
     }
 
 }

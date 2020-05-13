@@ -17,6 +17,8 @@ Route::post('login', 'ApiController@login');
 Route::post('update_settings', 'ApiController@update_settings');
 Route::post('change_password', 'ApiController@change_password');
 Route::post('verify_account', 'ApiController@verify_account');
+Route::post('send_reset_email', 'ApiController@send_reset_email');
+Route::post('reset_password', 'ApiController@reset_password');
 
 Route::post('invite_friend', 'InviteController@invite_friend');
 Route::post('get_referrals', 'InviteController@get_referrals');
